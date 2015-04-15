@@ -64,14 +64,14 @@ angular.module('trusteesApp')
           });
 
 
-          var previousLogin = $cookieStore.get('previouslogin') || '';
-          if(previousLogin.split(',').indexOf(user.email) === -1){
-            if(previousLogin.length){
-              previousLogin = previousLogin.concat(',');
+            var previousLogin = $cookieStore.get('previouslogin') || '';
+            if(previousLogin.split(',').indexOf(user.email) === -1){
+              if(previousLogin.length){
+                previousLogin = previousLogin.concat(',');
+              }
+              previousLogin = previousLogin.concat(user.email);
+              $cookieStore.put('previouslogin', previousLogin);
             }
-            previousLogin = previousLogin.concat(user.email);
-            $cookieStore.put('previouslogin', previousLogin);
-          }
 
           return cb();
         }).

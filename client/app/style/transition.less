@@ -14,8 +14,6 @@
 @z-layer-6: 30;
 
 
-//TODO stagger animations - for view to delay loa
-
 
 .mainview {
   .transition(transform @page-transition-duration ease opacity @page-transition-duration ease);
@@ -94,7 +92,7 @@ body.transitionTologin {
 
 body.transitionFromlogin.transitionToquickaccess {
   .mainview.ng-leave { animation: scaleDown @page-transition-duration-long both ease; }
-  .mainview.ng-enter { animation: slideInUpSlow @page-transition-duration-long both ease; .transform(translateY(100%)); }
+  .mainview.ng-enter { animation: slideInUpSlow @page-transition-duration-long both ease; }
 }
 
 

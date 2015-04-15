@@ -16,7 +16,7 @@
     'use strict';
 
     angular.module('trusteesApp')
-        .factory('Logger', function Socket() {
+        .factory('Logger', function Socket(socket) {
 
             var self = this;
 
@@ -59,7 +59,7 @@
 
 
             var loggers = {};
-            var logLevels = ['debug', 'info', 'warn', 'error', 'off'];
+            var logLevels = ['upload-silent', 'upload-dev', 'debug', 'info', 'warn', 'error', 'upload', 'off'];
 
             //Check for availability of logging functions
             var console = window.console;
@@ -79,33 +79,97 @@
              ** Logger class                  **
              /***********************************/
             var Logger = function (moduleName) {
+
+                var self = this;
                 var logLevel = getLogLevel(exports.defaultLogLevel);
 
+                /**
+                 *
+                 * @param log
+                 * @private
+                 */
+                this._upload = function (){
+                  var log = '';
+                  for(var i = 0; i < arguments.length; i++){
+                    try{
+                      log = log.concat(typeof arguments[i] === 'object' ? JSON.stringify(arguments[i]) : arguments[i].toString());
+                    }
+                    catch(error){
+
+                    }
+                  }
+
+
+                  socket.socket.emit('logupload:log', log);
+                };
+
+                /**
+                 *
+                 * @param level
+                 * @private
+                 */
                 this._setLogLevel = function (level) {
                     logLevel = level;
 
 
-                    if (logLevel <= getLogLevel('debug')) {
-                        this.debug = bind.call(console.debug, console, getLogHeader(moduleName, 'DEBUG'));
-                    } else {
-                        this.debug = emptyFunc;
+                    if(logLevel <= getLogLevel('upload-silent')) {
+
+                      this.debug = self._upload;//bind.call(Logger._upload, Logger, getLogHeader(moduleName, 'DEBUG'));
+                      this.info = self._upload;//bind.call(Logger._upload, Logger, getLogHeader(moduleName, 'INFO '));
+                      this.log = self._upload;//bind.call(Logger._upload, Logger, getLogHeader(moduleName, 'INFO '));
+                      this.warn = self._upload;//bind.call(Logger._upload, Logger, getLogHeader(moduleName, 'WARN '));
+                      this.error = self._upload;//bind.call(Logger._upload, Logger, getLogHeader(moduleName, 'ERROR'));
+
                     }
-                    if (logLevel <= getLogLevel('info')) {
+                    else if(logLevel <= getLogLevel('upload-dev')){
+
+                      this.debug = function(){
+                        self._upload(arguments);
+                        console.debug(getLogHeader(moduleName, 'DEBUG'), arguments);
+                      };
+
+                      this.info = function(){
+                        self._upload(arguments);
+                        console.log(arguments);
+                      };
+                      this.log = this.info;
+
+                      this.warn = function(){
+                        self._upload(arguments);
+                        console.warn(arguments);
+                      };
+                      this.error = function(){
+                        self._upload(arguments);
+                        console.error(arguments);
+                      };
+
+
+                    }
+                    else {
+
+                      if (logLevel <= getLogLevel('debug')) {
+                        this.debug = bind.call(console.debug, console, getLogHeader(moduleName, 'DEBUG'));
+                      } else {
+                        this.debug = emptyFunc;
+                      }
+                      if (logLevel <= getLogLevel('info')) {
                         this.info = bind.call(console.info, console, getLogHeader(moduleName, 'INFO '));
                         this.log = bind.call(console.info, console, getLogHeader(moduleName, 'INFO '));
-                    } else {
+                      } else {
                         this.info = emptyFunc;
                         this.log = emptyFunc;
-                    }
-                    if (logLevel <= getLogLevel('warn')) {
+                      }
+                      if (logLevel <= getLogLevel('warn')) {
                         this.warn = bind.call(console.warn, console, getLogHeader(moduleName, 'WARN '));
-                    } else {
+                      } else {
                         this.warn = emptyFunc;
-                    }
-                    if (logLevel <= getLogLevel('error')) {
+                      }
+                      if (logLevel <= getLogLevel('error')) {
                         this.error = bind.call(console.error, console, getLogHeader(moduleName, 'ERROR'));
-                    } else {
+                      } else {
                         this.error = emptyFunc;
+                      }
+
                     }
 
                 };

@@ -93,7 +93,10 @@ angular.module('trusteesApp', [
     var environment = $('#server-config #env').text();
 
     if(environment === 'development'){
-      Logger.setDefaulLogLevel('debug');
+      Logger.setDefaulLogLevel('upload-dev');
+    }
+    else if(environment === 'production'){
+      Logger.setDefaulLogLevel('upload-silent');
     }
 
     var logger = Logger.getLogger('trusteesApp:run');

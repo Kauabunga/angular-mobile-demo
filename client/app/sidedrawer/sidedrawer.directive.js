@@ -46,8 +46,8 @@ angular.module('trusteesApp')
             //delay for animation close
             $timeout(function(){
               action();
-            }, 175);
-          }, 100);
+            }, 300);
+          }, 50);
 
         }
 
